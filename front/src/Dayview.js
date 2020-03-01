@@ -84,8 +84,7 @@ class Dayview extends Component {
   }
   
   render() {  
-    var { path, url } = useRouteMatch();
-    
+    var { path, url } = this.props.match;
 
     function OfficerBanner(props){
       let text;
@@ -216,7 +215,7 @@ class Dayview extends Component {
 
         <Switch>
           <Route exact path={path}>
-            {Date.now()} testi
+            {Date.now().toLocaleString("fi-FI")} testi
           </Route>
           <Route path={`${path}/:trackId`} >
             <Trackview props={this.props} />
