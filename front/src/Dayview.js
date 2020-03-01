@@ -1,11 +1,5 @@
 import React, { Component } from "react";
-<<<<<<< HEAD
-import './Dayview.css';
-
-=======
 import "./Dayview.css";
-import { Link } from "react-router-dom";
->>>>>>> d3610b88512d1aa0827685f5894039d04aaa82d8
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import Grid from "@material-ui/core/Grid";
 import Box from "@material-ui/core/Box";
@@ -92,17 +86,11 @@ class Dayview extends Component {
       }
     );
   }
-<<<<<<< HEAD
   
   render() {  
     var { path, url } = this.props.match;
 
-    function OfficerBanner(props){
-=======
-
-  render() {
     function OfficerBanner(props) {
->>>>>>> d3610b88512d1aa0827685f5894039d04aaa82d8
       let text;
       let color;
 
@@ -232,7 +220,6 @@ class Dayview extends Component {
             </Grid>
           </Grid>
         </Grid>
-<<<<<<< HEAD
         <Link className="back" style={{color: 'black'}} to='/'>
           <ArrowBackIcon />Viikkonäkymään
         </Link>
@@ -247,15 +234,6 @@ class Dayview extends Component {
           </Route>
         </Switch>
 
-=======
-        <Link className="back" style={{ color: "black" }} to="/weekview">
-          <ArrowBackIcon />
-          Viikkonäkymään
-        </Link>
-        <Link className="hoverHand arrow-right" to="/trackview">
-          Ratanäkymä
-        </Link>
->>>>>>> d3610b88512d1aa0827685f5894039d04aaa82d8
       </div>
     );
   }

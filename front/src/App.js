@@ -20,8 +20,7 @@ class App extends Component {
               <Route path="/" exact component={Weekview} />
               <Route path="/signin" component={SignIn} />
               <Route path="/:date" component={Dayview} />
-              {//<Route path="/:date/:track" component={Trackview} /> 
-              }
+              <Route path="/:date/:track" component={Trackview} /> 
             </Switch>
           </header>
         </div>
