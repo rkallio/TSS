@@ -1,11 +1,22 @@
 import React, { Component } from "react";
 import './Dayview.css';
-import {Link} from 'react-router-dom';
+
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
 import {callApi} from './utils/helper.js';
 import { dayToString } from "./utils/Utils";
+
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link,
+  useParams,
+  useRouteMatch
+} from "react-router-dom";
+
+import Trackview from "./Trackview";
 
 class Dayview extends Component {
   
@@ -72,7 +83,10 @@ class Dayview extends Component {
     });
   }
   
-  render() {    
+  render() {  
+    var { path, url } = useRouteMatch();
+    
+
     function OfficerBanner(props){
       let text;
       let color;
@@ -195,10 +209,20 @@ class Dayview extends Component {
             </Grid>
           </Grid>
         </Grid>
-        <Link className="back" style={{color: 'black'}} to='/weekview'>
+        <Link className="back" style={{color: 'black'}} to='/'>
           <ArrowBackIcon />Viikkonäkymään
         </Link>
         <Link className="hoverHand arrow-right" to="/trackview">Ratanäkymä</Link>
+
+        <Switch>
+          <Route exact path={path}>
+            {Date.now()} testi
+          </Route>
+          <Route path={`${path}/:trackId`} >
+            <Trackview props={this.props} />
+          </Route>
+        </Switch>
+
       </div>
     );
   }
