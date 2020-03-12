@@ -11,6 +11,8 @@ const track = require("./controllers/track");
 const scheduleTrack = require("./controllers/scheduleTrack");
 const scheduleDate = require("./controllers/scheduleDate");
 
+
+
 /*
 *  Authorization requires jwt token given by login
 *  in the body of the request
@@ -54,6 +56,25 @@ authorize = function(req, res, next) {
     });
   }
 }
+
+//router.post('/user')
+
+const userService = require('./services/user')
+const Promise = require('bluebird')
+router.get('/user', (req, res) => {
+  userService.read({})
+    .then(users => res.json(users))
+  // res.json(userService.read({name: 'mark'}))
+})
+
+router.get('/user/:id', (req, res) => {
+  
+})
+//router.get('/user/:id')
+
+//router.patch('/user/:id')
+
+//router.delete('/user/:id')
 
 /*
  *  Login with post
