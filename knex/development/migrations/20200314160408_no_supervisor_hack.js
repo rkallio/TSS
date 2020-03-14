@@ -8,8 +8,10 @@ exports.up = function(knex) {
 
 exports.down = function(knex) {
   return knex.schema.alterTable('range_reservation', reservation => {
-    reservation.boolean('available')
-      .notNullable()
-      .alter()
-   })
+    reservation.dropColumn('available')
+  }).then(() => {
+    knex.schema.alterTable('range_reservation', reservation => {
+      reservation.boolean('available')
+    })
+  })
 }
