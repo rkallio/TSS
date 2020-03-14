@@ -24,9 +24,6 @@ exports.seed = function(knex) {
 }
 
 casual.define('range_reservation', function(rangeId, dateFn) {
-  
-  const available = ([true, false, undefined])
-  
   return {
     range_id: rangeId,
     date: dateFn().format('YYYY-MM-DD'),
