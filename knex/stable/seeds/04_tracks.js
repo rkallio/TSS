@@ -30,7 +30,6 @@ const tracks = [
 ]
 
 exports.seed = function(knex) {
-  // Deletes ALL existing entries
   return knex('range')
     .where({
       name: 'SATLSTO:n ampumarata'
