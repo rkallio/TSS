@@ -5,15 +5,15 @@ const _ = require('lodash')
 const path = require('path')
 const root = path.join(__dirname, '..')
 const services = require(path.join(root, 'services'))
-const secret = require(path.join(root, 'config', 'config')).jwt.secret
+const config = require(path.join(root, 'config'))
+
 
 const controller = {
   sign: async function signUser(request, response) {
     let token = jwt.sign({
       id: response.locals.id
-    }, secret)
+    }, config.jwt.secret)
 
-    //lähetetään myös 
     return response
       .status(200)
       .set('Set-Cookie', `access=${token}; Secure; HttpOnly;`)
