@@ -9,11 +9,15 @@ const secret = require(path.join(root, 'config', 'config')).jwt.secret
 
 const controller = {
   sign: async function signUser(request, response) {
+    let token = jwt.sign({
+      id: response.locals.id
+    }, secret)
+
+    //lähetetään myös 
     return response
       .status(200)
-      .send(jwt.sign({
-        id: response.locals.id
-      }, secret))
+      .set('Set-Cookie', `access=${token}; Secure; HttpOnly;`)
+      .send()
   }
 
   , readFilter: async function readFilterUsers(request, response) {
