@@ -26,17 +26,17 @@ export async function getSchedulingWeek(date) {
     const current = moment(begin);
     const next = moment.prototype.add.bind(current, 1, 'day');
 
-    const responses = await Promise.all(lodash.times(7, (i) => {
-      const request = getSchedulingDate(current)
-      next()
-      return request
+    const week = await Promise.all(lodash.times(7, (i) => {
+      const request = getSchedulingDate(current);
+      next();
+      return request;
     }));
 
     return {
       weekNum: weekNum
       , weekBegin: begin.format('YYYY-MM-DD')
       , weekEnd: end.format('YYYY-MM-DD')
-      , week: responses
+      , week: week
     };
   } catch(err) {
     console.error(err);
