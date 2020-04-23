@@ -10,6 +10,12 @@ const router = require("./routes");
 const port = process.env.ALT_PORT || process.env.PORT || 8000; //azure gives port as an environment variable
 const os = require("os")
 
+const fs = require('fs');
+const key = fs.readFileSync('./key.pem');
+const cert = fs.readFileSync('./cert.pem');
+const https = require('https');
+const server = https.createServer({key: key, cert: cert }, app);
+
 app.use(helmet());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -21,7 +27,7 @@ app.use("/api", router);
 // Rendering the front-end react app
 app.use("/", express.static("front/build/"))
 
-app.listen(port, () => {
+server.listen(port, () => {
     console.log("Server on " + port)
 })
 
