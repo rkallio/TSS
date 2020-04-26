@@ -1,31 +1,19 @@
 const _ = require('lodash')
 
-exports.seed = function(knex) {
-
-  function truncate(table) {
-    return knex(table)
-      .del()
+exports.seed = async function(knex) {
+  const truncate =  async(table) => {
+    process.stdout.write(`Truncate ${table}...`)
+    const response = await knex(table).del()
+    console.log('done')
+    return response
   }
-
-  truncateTrackHistory = _.partial(truncate, 'track_supervision_history')
-  truncateTrackSupervision = _.partial(truncate, 'track_supervision')
-  truncateRangeHistory = _.partial(truncate, 'range_supervision_history')
-  truncateRangeSupervision = _.partial(truncate, 'range_supervision')
-  truncateScheduledRangeSupervision = _.partial(truncate, 'scheduled_range_supervision')
-  truncateRangeReservation = _.partial(truncate, 'range_reservation')
-  truncateTrack = _.partial(truncate, 'track')
-  truncateRange = _.partial(truncate, 'range')
-  truncateSupervisor = _.partial(truncate, 'supervisor')
-  truncateUser = _.partial(truncate, 'user')
-
-  return truncateTrackHistory()
-    .then(truncateRangeHistory)
-    .then(truncateTrackSupervision)
-    .then(truncateRangeSupervision)
-    .then(truncateScheduledRangeSupervision)
-    .then(truncateRangeReservation)
-    .then(truncateTrack)
-    .then(truncateRange)
-    .then(truncateSupervisor)
-    .then(truncateUser)
+  await truncate('track_supervision_history')
+  await truncate('track_supervision')
+  await truncate('range_supervision')
+  await truncate('scheduled_range_supervision')
+  await truncate('range_reservation')
+  await truncate('track')
+  await truncate('range')
+  await truncate('supervisor')
+  await truncate('user')
 }

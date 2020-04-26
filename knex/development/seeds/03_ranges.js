@@ -5,16 +5,25 @@ const config = require(path.join(root, 'config'))
 const _ = require('lodash')
 const casual = require('casual')
 
-casual.seed(0)
+casual.seed(config.seeds.seed)
 
-exports.seed = function(knex) {
-  const ranges = _.times(config.seeds.ranges, casual._shooting_range)
+exports.seed = async function(knex) {
 
-  return knex('range')
-    .insert(ranges)
+  process.stdout.write(`${config.seeds.ranges} ranges...`)
+  const ranges = await Promise.all(
+    _.times(
+      config.seeds.ranges
+      , casual._shooting_range))
+  console.log('done')
+
+  process.stdout.write('Inserting...')
+  await Promise.all(
+    _.chunk(ranges, config.seeds.chunkSize)
+      .map(async (rangeChunk) => knex('range').insert(rangeChunk)))
+  console.log('done')
 };
 
-casual.define('shooting_range', function() {
+casual.define('shooting_range', async function() {
   return {
     name: casual.company_name + ' Shooting Range'
   }
