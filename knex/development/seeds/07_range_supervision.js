@@ -1,5 +1,6 @@
 const casual = require('casual')
 const _ = require('lodash')
+const ora = require('ora')
 
 const path = require('path')
 const root = path.join(__dirname, '..', '..', '..')
@@ -12,18 +13,25 @@ exports.seed = async function(knex) {
     await knex('scheduled_range_supervision')
       .select('id').whereNotNull('supervisor_id')).map(({id}) => id)
 
-  process.stdout.write(`${schedule.length} range supervisions...`)
-  const supervisions = await Promise.all(
+  const generateSupervisions = Promise.all(
     schedule.map(id => casual.range_supervision(id)))
-  console.log('done')
 
-  process.stdout.write('Inserting...')
-  await Promise.all(
+  const generateSpinner = ora.promise(
+    generateSupervisions
+    , `Generating ${schedule.length} range supervisions...`)
+  const supervisions = await generateSupervisions
+
+  const insertSupervisions = Promise.all(
     _.chunk(supervisions, config.seeds.chunkSize)
       .map(async (supervisionChunk) => (
         knex('range_supervision')
           .insert(supervisionChunk))))
-  console.log('done')
+
+  const insertSpinner = ora.promise(
+    insertSupervisions
+    , 'Inserting range supervisions')
+
+  const response = await insertSupervisions
 }
 
 casual.define('range_supervision', async (supervisionId) => {

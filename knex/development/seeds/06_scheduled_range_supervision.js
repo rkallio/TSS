@@ -1,6 +1,7 @@
 const casual = require('casual')
 const moment = require('moment')
 const _ = require('lodash')
+const ora = require('ora')
 
 const path = require('path')
 const root = path.join(__dirname, '..', '..', '..')
@@ -17,20 +18,26 @@ exports.seed = async function(knex) {
       .select('user_id')
   ])
 
-  process.stdout.write(`${availableReservations.length} schedules...`)
-  const schedules = await Promise.all(availableReservations.map(({id}) => (
+  const generateSchedules = Promise.all(availableReservations.map(({id}) => (
     casual.supervision(
       id
       , supervisors[casual.integer(0, supervisors.length - 1)].user_id))))
-  console.log('done')
 
-  process.stdout.write('Inserting...')
-  await Promise.all(
+  const generateSpinner = ora.promise(
+    generateSchedules
+    , `Generating ${availableReservations.length} schedules`)
+
+  const schedules = await generateSchedules
+
+  const insertSchedules = Promise.all(
     _.chunk(schedules, config.seeds.chunkSize)
       .map(async (scheduleBatch) => (
         knex('scheduled_range_supervision')
           .insert(scheduleBatch))))
-  console.log('done')
+  const insertSpinner = ora.promise(
+    insertSchedules
+    , 'Inserting schedules')
+  const response = await insertSchedules
 }
 
 casual.define('supervision', function(reservationId, supervisor) {

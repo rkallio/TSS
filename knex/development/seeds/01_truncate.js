@@ -1,11 +1,11 @@
 const _ = require('lodash')
+const ora = require('ora')
 
 exports.seed = async function(knex) {
   const truncate =  async(table) => {
-    process.stdout.write(`Truncate ${table}...`)
-    const response = await knex(table).del()
-    console.log('done')
-    return response
+    const promise = knex(table).del()
+    ora.promise(promise, `Truncate ${table}`)
+    return await promise
   }
   await truncate('track_supervision_history')
   await truncate('track_supervision')

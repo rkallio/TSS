@@ -4,6 +4,7 @@ const config = require(path.join(root, 'config'))
 
 const _ = require('lodash')
 const casual = require('casual')
+const ora = require('ora')
 
 casual.seed(config.seeds.seed)
 
@@ -11,20 +12,23 @@ exports.seed = async function(knex) {
   const ranges = config.seeds.ranges
   const tracks = config.seeds.tracks
   const total = ranges * tracks
-  process.stdout.write(
-    `${ranges} ranges * ${tracks} tracks = ${total} tracks...`)
 
-  const _tracks = _.flatten(
-    await Promise.all(
-      (await knex('range')
-       .select('id'))
-        .map(async ({id}) => casual.range(id))))
-  console.log('done')
-  process.stdout.write('Inserting...')
-  await Promise.all(
+  const generateTracks = Promise.all(
+    (await knex('range')
+     .select('id'))
+      .map(async ({id}) => casual.range(id)))
+
+  const generateSpinner = ora.promise(
+    generateTracks
+    , `Generating ${ranges} ranges * ${tracks} tracks = ${total} tracks`)
+  const _tracks = _.flatten(await generateTracks)
+
+  const insertTracks = Promise.all(
     _.chunk(_tracks, config.seeds.chunkSize)
       .map(async (trackChunk) => knex('track').insert(trackChunk)))
-  console.log('done')
+
+  const insertSpinner = ora.promise(insertTracks, 'Inserting tracks')
+  const response = await insertTracks
 }
 
 casual.define('track_description', function() {

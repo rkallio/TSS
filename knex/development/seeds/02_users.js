@@ -5,25 +5,27 @@ const _ = require('lodash')
 
 const casual = require('casual')
 const bcrypt = require('bcryptjs')
+const ora = require('ora')
 
 casual.seed(config.seeds.seed)
 exports.seed = async function(knex) {
   const listedUsers = Math.min(config.seeds.users, 50)
-  process.stdout.write(`Generating ${config.seeds.users} users...`)
-  const users = await Promise.all(_.times(config.seeds.users, casual._user))
-  console.log('done')
+
+  const generateUsers = Promise.all(_.times(config.seeds.users, casual._user))
+  const generateSpinner = ora.promise(
+    generateUsers
+    , `Generating ${config.seeds.users} users`)
+  const users = await generateUsers
+
   const head = _.take(users, listedUsers)
         .map(_.partialRight(_.pick, ['name', 'role', 'password']))
   console.log(`First ${listedUsers} users:\n${JSON.stringify(head, null, 2)}`)
 
-  process.stdout.write('Inserting...')
-  // Await used to make console.logs fire at the right time
-  await Promise.all(
+  const insertUsers = Promise.all(
     _.chunk(users, config.seeds.chunkSize)
       .map(async (userChunk) => {
         const users = userChunk
               .map(user => _.pick(user, ['name', 'role', 'digest']))
-
         const supervisors =
               (await knex('user')
                .insert(users)
@@ -35,7 +37,8 @@ exports.seed = async function(knex) {
         await knex('supervisor')
           .insert(supervisors)
       }))
-  console.log('done')
+  const insertSpinner = ora.promise(insertUsers, 'Inserting users')
+  const response = await insertUsers
 }
 
 casual.define('user', async function() {
