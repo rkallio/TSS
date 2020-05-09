@@ -9,6 +9,8 @@ const helmet = require('helmet');
 const router = require("./routes");
 const port = process.env.ALT_PORT || process.env.PORT || 8000; //azure gives port as an environment variable
 const os = require("os")
+const fs = require('fs')
+const https = require('https')
 
 app.use(helmet());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -21,9 +23,13 @@ app.use("/api", router);
 // Rendering the front-end react app
 app.use("/", express.static("front/build/"))
 
-app.listen(port, () => {
-    console.log("Server on " + port)
-})
+// Wrap the express app inside a https server
+const server = https.createServer({
+  key: fs.readFileSync('key.pem'),
+  cert: fs.readFileSync('certificate.pem')
+}, app)
+
+server.listen(port, () => console.log(`Server on ${port}`))
 
 if(process.env.NODE_ENV === 'stable' && os.hostname() === 'tasera.netum.fi') {
   if(process.getgid() === 0 || process.getuid() === 0) {
