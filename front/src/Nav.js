@@ -103,7 +103,7 @@ const SuperMenu = ({anchorEl, HandleClose, setOpenDial, HandleSignOut,
       </Link>
 
       <Link style={navStyle} to="/tracks">
-        <MenuItem>Radat</MenuItem>
+        <MenuItem>{nav.trackCRUD[fin]}</MenuItem>
       </Link>
 
 

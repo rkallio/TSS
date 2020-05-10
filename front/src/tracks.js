@@ -8,6 +8,8 @@ import Alert from '@material-ui/lab/Alert'
 import Snackbar from '@material-ui/core/Snackbar'
 import MaterialTable from 'material-table'
 
+import * as l10nLines from './texts/texts.json'
+
 import lodash from 'lodash'
 import axios from 'axios'
 
@@ -31,7 +33,6 @@ import SaveAlt from '@material-ui/icons/SaveAlt'
 import Search from '@material-ui/icons/Search'
 import ViewColumn from '@material-ui/icons/ViewColumn'
 
-
 const tableIcons = {
   Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
   Check: forwardRef((props, ref) => <Check {...props} ref={ref} />),
@@ -53,6 +54,9 @@ const tableIcons = {
 }
 
 
+
+const l10n = l10nLines.tracks
+const lang = localStorage.getItem("language")
 
 /* Get first element of an array */
 Array.prototype.head = function() {
@@ -80,31 +84,57 @@ const MaybeProgress = ({finished}) => finished
 const TrackTable = ({setTrackData, trackData, setRequestStatus, setRequestText, opts}) => {
   return (
     <MaterialTable
-      editable={{
-        onRowAdd: ({name, description}) => {
-          return new Promise(async (resolve, reject) => {
-            try
-            {
-              const response = await axios.post(
-                '/api/track'
-                , {name: name
-                   , description: description
-                   , range_id: trackData[0].range_id
-                  }, opts)
-              setTrackData(trackData.concat(response.data))
-              setRequestStatus('success')
-              setRequestText('Rata lisätty')
-              resolve()
-            }
-            catch(e)
-            {
-              setRequestStatus('error')
-              setRequestText('Radan lisäys epäonnistui')
-              reject()
-            }
-          })
+      localization={{
+        pagination: {
+          nextTooltip: l10n.nextTooltip[lang],
+          previousTooltip: l10n.previousTooltip[lang],
+          firstTooltip: l10n.firstTooltip[lang],
+          lastTooltip: l10n.lastTooltip[lang],
+          labelDisplayedRows: l10n.pagination[lang],
+          labelRowsSelect: l10n.labelRowsSelect[lang]
         }
-        , onRowUpdate: (newData, oldData) => {
+        , header: {
+          actions: l10n.tableHeaderActions[lang]
+        }
+        , toolbar: {
+          searchPlaceholder: l10n.searchPlaceholder[lang]
+        }
+        , body: {
+          emptyDataSourceMessage: l10n.emptyDataSourceMessage[lang],
+          editTooltip: l10n.editTooltip[lang],
+          editRow: {
+            saveTooltip: l10n.saveTooltip[lang],
+            cancelTooltip: l10n.cancelTooltip[lang]
+          }
+        }
+      }}
+      // Other views only support viewing 7 tracks, so no adding or deleting
+      // tracks.
+      editable={{
+        // onRowAdd: ({name, description}) => {
+        //   return new Promise(async (resolve, reject) => {
+        //     try
+        //     {
+        //       const response = await axios.post(
+        //         '/api/track'
+        //         , {name: name
+        //            , description: description
+        //            , range_id: trackData[0].range_id
+        //           }, opts)
+        //       setTrackData(trackData.concat(response.data))
+        //       setRequestStatus('success')
+        //       setRequestText('Rata lisätty')
+        //       resolve()
+        //     }
+        //     catch(e)
+        //     {
+        //       setRequestStatus('error')
+        //       setRequestText('Radan lisäys epäonnistui')
+        //       reject()
+        //     }
+        //   })
+        // }
+        onRowUpdate: (newData, oldData) => {
           return new Promise(async (resolve, reject) => {
             resolve()
             const trackInfo = trackData
@@ -114,7 +144,7 @@ const TrackTable = ({setTrackData, trackData, setRequestStatus, setRequestText, 
             if(trackInfo === undefined)
             {
               setRequestStatus('error')
-              setRequestText('Radan muokkaus epäonnistui')
+              setRequestText(l10n.rowUpdateFail[lang])
               reject()
             }
 
@@ -128,60 +158,61 @@ const TrackTable = ({setTrackData, trackData, setRequestStatus, setRequestText, 
                     .concat(Object.assign({}, trackInfo, newData))
               setTrackData(modified)
               setRequestStatus('success')
-              setRequestText('Rataa muokattu')
+              setRequestText(l10n.rowUpdateSuccess[lang])
             }
             catch(e)
             {
               setRequestStatus('error')
-              setRequestText('Radan muokkaus epäonnistui')
+              setRequestText(l10n.rowUpdateFail[lang])
               reject()
             }
             resolve()
           })
         }
-        , onRowDelete: ({name, description}) => {
-          return new Promise(async (resolve, reject) => {
+        // , onRowDelete: ({name, description}) => {
+        //   return new Promise(async (resolve, reject) => {
 
-            const trackInfo = trackData
-                  .filter(track => track.name === name
-                          && track.description === description)
-                  .head()
+        //     const trackInfo = trackData
+        //           .filter(track => track.name === name
+        //                   && track.description === description)
+        //           .head()
 
-            // Should never happen
-            if(trackInfo === undefined)
-            {
-              setRequestStatus('error')
-              setRequestText('Radan poisto epäonnistui')
-              reject()
-            }
+        //     // Should never happen
+        //     if(trackInfo === undefined)
+        //     {
+        //       setRequestStatus('error')
+        //       setRequestText('Radan poisto epäonnistui')
+        //       reject()
+        //     }
 
-            try
-            {
-              const response = await axios.delete(`/api/track/${trackInfo.id}`, opts)
-              setTrackData(trackData.filter(track => track.id !== trackInfo.id))
-              setRequestStatus('success')
-              setRequestText('Rata poistettu')
-              resolve()
-            }
-            catch(e)
-            {
-              setRequestStatus('error')
-              setRequestText('Radan poisto epäonnistui')
-              reject()
-            }
-          })
-        }
+        //     try
+        //     {
+        //       const response = await axios.delete(`/api/track/${trackInfo.id}`, opts)
+        //       setTrackData(trackData.filter(track => track.id !== trackInfo.id))
+        //       setRequestStatus('success')
+        //       setRequestText('Rata poistettu')
+        //       resolve()
+        //     }
+        //     catch(e)
+        //     {
+        //       setRequestStatus('error')
+        //       setRequestText('Radan poisto epäonnistui')
+        //       reject()
+        //     }
+
+        //   })
+        // }
       }}
       options={{
         pageSize: 10
       }}
       icons={tableIcons}
       columns={[
-        { title: 'Nimi', field: 'name', editable:'always' },
-        { title: 'Kuvaus', field: 'description', editable:'always' },
+        { title: l10n.tableHeaderName[lang], field: 'name' }
+        , { title: l10n.tableHeaderDescription[lang], field: 'description' },
       ]}
       data={trackData}
-      title="Radat"
+      title={ l10n.tableTitle[lang] }
     />
   )
 }
@@ -221,22 +252,22 @@ const TrackCRUD = () => {
   }, [initFinished])
 
   return (
-      <ScopedCssBaseline>
-        <Container>
-          <MaybeProgress finished={initFinished} />
-          <TrackTable
-            setTrackData={setTrackData}
-            trackData={trackData}
-            setRequestStatus={setRequestStatus}
-            setRequestText={setRequestText}
-            opts={opts} />
-          <RequestStatusAlert
-            statusSetter={setRequestStatus}
-            requestStatus={requestStatus}
-            text={requestText}
-            textSetter={setRequestText} />
-        </Container>
-      </ScopedCssBaseline>)
+    <ScopedCssBaseline>
+      <Container>
+        <MaybeProgress finished={initFinished} />
+        <TrackTable
+          setTrackData={setTrackData}
+          trackData={trackData}
+          setRequestStatus={setRequestStatus}
+          setRequestText={setRequestText}
+          opts={opts} />
+        <RequestStatusAlert
+          statusSetter={setRequestStatus}
+          requestStatus={requestStatus}
+          text={requestText}
+          textSetter={setRequestText} />
+      </Container>
+    </ScopedCssBaseline>)
 }
 
 export default TrackCRUD
