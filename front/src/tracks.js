@@ -59,9 +59,6 @@ const l10n = l10nLines.tracks
 const lang = localStorage.getItem("language")
 
 /* Get first element of an array */
-Array.prototype.head = function() {
-  return this[0]
-}
 
 const RequestStatusAlert = ({statusSetter, requestStatus, text}) => {
   if(requestStatus === null)
@@ -139,8 +136,8 @@ const TrackTable = ({setTrackData, trackData, setRequestStatus, setRequestText, 
             resolve()
             const trackInfo = trackData
                   .filter(track => track.name === oldData.name
-                          && track.description === oldData.description)
-                  .head()
+                          && track.description === oldData.description)[0]
+
             if(trackInfo === undefined)
             {
               setRequestStatus('error')
